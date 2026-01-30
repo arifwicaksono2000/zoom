@@ -26,30 +26,31 @@ class Workspace extends Model
         $zoom = Zoom::getWorkspaceReservations($this->workspace_id, $from, $to);
         return $zoom;
     }
-    public function getReservationbyReservationId($reservation_id)
+    public static function getReservationbyReservationId($workspace_id, $reservation_id)
     {
-        $zoom = Zoom::getReservationbyReservationId($this->workspace_id, $reservation_id);
+        $zoom = Zoom::getReservationbyReservationId($workspace_id, $reservation_id);
         return $zoom;
     }
-    public function createReservation($data)
+    public static function createReservation($data, $workspace_id)
     {
-        $zoom = Zoom::createReservation($data, $this->workspace_id, $data['reserve_for']);
+        $zoom = Zoom::createReservation($data, $workspace_id);
+        return $zoom;
         $data['reservation_id'] = $zoom['reservation_id'];
         $reservation = Reservation::create($data);
         return $reservation;
     }
-    public function updateReservation($data, $id)
+    public static function updateReservation($data, $workspace_id, $reservation_id)
     {
-        Zoom::updateReservation($data, $this->workspace_id, $id);
-        $reservation = Reservation::where('reservation_id', $id)->first();
-        $reservation->update($data);
-        return $reservation;
+        $zoom = Zoom::updateReservation($data, $workspace_id, $reservation_id);
+        // $reservation = Reservation::where('reservation_id', $reservation_id)->first();
+        // $reservation->update($data);
+        return $zoom;
     }
-    public function deleteReservation($id)
+    public static function deleteReservation($workspace_id, $reservation_id)
     {
-        Zoom::deleteReservation($this->workspace_id, $id);
-        $reservation = Reservation::where('reservation_id', $id)->first();
-        $reservation->delete();
-        return $reservation;
+        $zoom = Zoom::deleteReservation($workspace_id, $reservation_id);
+        // $reservation = Reservation::where('reservation_id', $reservation_id)->first();
+        // $reservation->delete();
+        return $zoom;
     }
 }

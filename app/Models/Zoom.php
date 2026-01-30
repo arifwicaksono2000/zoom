@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Zoom extends Model
 {
     //
-    private function login()
+    private static function login()
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -22,47 +22,55 @@ class Zoom extends Model
             CURLOPT_POSTFIELDS => 'grant_type=account_credentials&account_id=' . env('ZOOM_ACCOUNT_ID'),
             CURLOPT_HTTPHEADER => array(
                 'Host: zoom.us',
-                'Authorization: Basic ' . env('ZOOM_CLIENT_ID') . ':' . env('ZOOM_CLIENT_SECRET'),
+                'Authorization: Basic ' . base64_encode(env('ZOOM_CLIENT_ID') . ':' . env('ZOOM_CLIENT_SECRET')),
                 'Content-Type: application/x-www-form-urlencoded',
             ),
         ));
 
         $response = curl_exec($curl);
         curl_close($curl);
+        // logger()->info('Zoom login', [
+        //     'url' => env('ZOOM_OAUTH_URL'),
+        //     'client_id' => env('ZOOM_CLIENT_ID'),
+        //     'client_secret' => env('ZOOM_CLIENT_SECRET'),
+        //     'account_id' => env('ZOOM_ACCOUNT_ID'),
+        //     'Authorization' => 'Basic ' . base64_encode(env('ZOOM_CLIENT_ID') . ':' . env('ZOOM_CLIENT_SECRET')),
+        //     'response' => $response,
+        // ]);
         return $response;
     }
-    public function createReservation($data, $workspace_id)
+    public static function createReservation($data, $workspace_id)
     {
-        $response = $this->apiCreateReservation($data, $workspace_id);
+        $response = self::apiCreateReservation($data, $workspace_id);
         return $response;
     }
-    public function updateReservation($data, $workspace_id, $reservation_id)
+    public static function updateReservation($data, $workspace_id, $reservation_id)
     {
-        $response = $this->apiUpdateReservation($data, $workspace_id, $reservation_id);
+        $response = self::apiUpdateReservation($data, $workspace_id, $reservation_id);
         return $response;
     }
-    public function deleteReservation($workspace_id, $reservation_id)
+    public static function deleteReservation($workspace_id, $reservation_id)
     {
-        $response = $this->apiDeleteReservation($workspace_id, $reservation_id);
+        $response = self::apiDeleteReservation($workspace_id, $reservation_id);
         return $response;
     }
-    public function getWorkspaceReservations($workspace_id, $from, $to)
+    public static function getWorkspaceReservations($workspace_id, $from, $to)
     {
-        $response = $this->apiGetWorkspaceReservations($workspace_id, $from, $to);
+        $response = self::apiGetWorkspaceReservations($workspace_id, $from, $to);
         return $response;
     }
-    public function getReservationbyReservationId($workspace_id, $reservation_id)
+    public static function getReservationbyReservationId($workspace_id, $reservation_id)
     {
-        $response = $this->apiGetReservationbyReservationId($workspace_id, $reservation_id);
+        $response = self::apiGetReservationbyReservationId($workspace_id, $reservation_id);
         return $response;
     }
-    public function listWorkspacebyLocation($location_id)
+    public static function listWorkspacebyLocation($location_id)
     {
-        $response = $this->apiGetWorkspacebyLocation($location_id);
+        $response = self::apiGetWorkspacebyLocation($location_id);
         return $response;
     }
 
-    private function apiCreateReservation($data, $workspace_id)
+    private static function apiCreateReservation($data, $workspace_id)
     {
         $curl = curl_init();
 
@@ -101,7 +109,7 @@ class Zoom extends Model
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json',
                 'Accept: application/json',
-                'Authorization: ' . $this->login(),
+                'Authorization: Bearer ' . json_decode(self::login())->access_token,
             ),
         ));
 
@@ -109,7 +117,7 @@ class Zoom extends Model
         curl_close($curl);
         return $response;
     }
-    private function apiGetWorkspaceReservations($workspace_id, $from, $to)
+    private static function apiGetWorkspaceReservations($workspace_id, $from, $to)
     {
         $curl = curl_init();
 
@@ -124,7 +132,7 @@ class Zoom extends Model
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
-                'Authorization: ' . $this->login(),
+                'Authorization: Bearer ' . json_decode(self::login())->access_token,
             ),
         ));
 
@@ -133,7 +141,7 @@ class Zoom extends Model
         curl_close($curl);
         return $response;
     }
-    private function apiGetReservationbyReservationId($workspace_id, $reservation_id)
+    private static function apiGetReservationbyReservationId($workspace_id, $reservation_id)
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -147,7 +155,7 @@ class Zoom extends Model
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
-                'Authorization: ' . $this->login(),
+                'Authorization: Bearer ' . json_decode(self::login())->access_token,
             ),
         ));
 
@@ -156,7 +164,7 @@ class Zoom extends Model
         curl_close($curl);
         return $response;
     }
-    private function apiUpdateReservation($data, $workspace_id, $reservation_id)
+    private static function apiUpdateReservation($data, $workspace_id, $reservation_id)
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -172,7 +180,7 @@ class Zoom extends Model
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json',
                 'Accept: application/json',
-                'Authorization: ' . $this->login(),
+                'Authorization: Bearer ' . json_decode(self::login())->access_token,
             ),
         ));
 
@@ -181,7 +189,7 @@ class Zoom extends Model
         curl_close($curl);
         return $response;
     }
-    private function apiDeleteReservation($workspace_id, $reservation_id)
+    private static function apiDeleteReservation($workspace_id, $reservation_id)
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -195,7 +203,7 @@ class Zoom extends Model
             CURLOPT_CUSTOMREQUEST => 'DELETE',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
-                'Authorization: ' . $this->login(),
+                'Authorization: Bearer ' . json_decode(self::login())->access_token,
             ),
         ));
 
@@ -204,7 +212,7 @@ class Zoom extends Model
         curl_close($curl);
         return $response;
     }
-    private function apiGetWorkspacebyLocation($location_id)
+    private static function apiGetWorkspacebyLocation($location_id)
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -218,7 +226,7 @@ class Zoom extends Model
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
-                'Authorization: ' . $this->login(),
+                'Authorization: Bearer ' . json_decode(self::login())->access_token,
             ),
         ));
 
