@@ -24,8 +24,5 @@ class Reservation extends Model
     {
         return $this->belongsTo(Workspace::class);
     }
-    public static function create(array $data)
-    {
-        return self::create($data);
-    }
+
 }

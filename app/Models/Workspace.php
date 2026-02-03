@@ -34,11 +34,12 @@ class Workspace extends Model
     public static function createReservation($data, $workspace_id)
     {
         $zoom = Zoom::createReservation($data, $workspace_id);
-        
+        return $zoom;
+
         $response = json_decode($zoom, true);
 
         if (isset($response['reservation_id'])) {
-             $dbData = [
+            $dbData = [
                 'workspace_id' => $workspace_id,
                 'reservation_id' => $response['reservation_id'],
                 'start_time' => $data['start_time'],
@@ -50,26 +51,24 @@ class Workspace extends Model
             ];
             Reservation::create($dbData);
         }
-
-        return $zoom;
     }
     public static function updateReservation($data, $workspace_id, $reservation_id)
     {
         $zoom = Zoom::updateReservation($data, $workspace_id, $reservation_id);
-        
+
         $reservation = Reservation::where('reservation_id', $reservation_id)->first();
         if ($reservation) {
-             $updateData = [
+            $updateData = [
                 'start_time' => $data['start_time'],
                 'end_time' => $data['end_time'],
                 'topic' => $data['topic'],
             ];
-            
+
             // Only update optional fields if they are present in the request
-            if(isset($data['reserve_for'])) {
+            if (isset($data['reserve_for'])) {
                 $updateData['reserve_for'] = $data['reserve_for'];
             }
-             if(isset($data['meeting'])) {
+            if (isset($data['meeting'])) {
                 $updateData['meeting'] = json_encode($data['meeting']);
             }
 
@@ -81,12 +80,12 @@ class Workspace extends Model
     public static function deleteReservation($workspace_id, $reservation_id)
     {
         $zoom = Zoom::deleteReservation($workspace_id, $reservation_id);
-        
+
         $reservation = Reservation::where('reservation_id', $reservation_id)->first();
         if ($reservation) {
             $reservation->delete();
         }
-        
+
         return $zoom;
     }
 }

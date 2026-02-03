@@ -53,10 +53,11 @@ class ReservationController extends Controller
             if (isset($response['code']) && $response['code'] >= 300) {
                 return response()->json(['message' => 'Reservation failed', 'data' => $response], 400);
             }
-            
+
             return response()->json([
+                // 'response' => $response,
                 'reservation_id' => $response['reservation_id'], // Note: User requested extra space in key
-                'status' => 'checked_in' 
+                'status' => $response['reservation_id']
             ]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Reservation failed', 'data' => $e->getMessage()], 500);
