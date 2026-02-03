@@ -42,7 +42,11 @@ class ReservationController extends Controller
                 $data['reserve_for'] = $request->reserve_for;
             }
             $reservation = Workspace::createReservation($data, $request->workspace_id);
-            return response()->json(['message' => 'Reservation created', 'data' => $reservation]);
+            $response = json_decode($reservation, true);
+            if (isset($response['code']) && $response['code'] >= 300) {
+                return response()->json(['message' => 'Reservation failed', 'data' => $response], 400);
+            }
+            return response()->json(['message' => 'Reservation created', 'data' => $response]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Reservation failed', 'data' => $e->getMessage()], 500);
         }
@@ -51,7 +55,11 @@ class ReservationController extends Controller
     {
         try {
             $reservation = Workspace::getReservationbyReservationId($workspace_id, $reservation_id);
-            return response()->json(['message' => 'Reservation found', 'data' => $reservation]);
+            $response = json_decode($reservation, true);
+            if (isset($response['code']) && $response['code'] >= 300) {
+                return response()->json(['message' => 'Reservation not found', 'data' => $response], 404);
+            }
+            return response()->json(['message' => 'Reservation found', 'data' => $response]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Reservation not found', 'data' => $e->getMessage()], 500);
         }
@@ -87,7 +95,11 @@ class ReservationController extends Controller
             //     $data['reserve_for'] = $request->reserve_for;
             // }
             $reservation = Workspace::updateReservation($data, $request->workspace_id, $request->reservation_id);
-            return response()->json(['message' => 'Reservation updated', 'data' => $reservation]);
+            $response = json_decode($reservation, true);
+            if (isset($response['code']) && $response['code'] >= 300) {
+                return response()->json(['message' => 'Reservation failed', 'data' => $response], 400);
+            }
+            return response()->json(['message' => 'Reservation updated', 'data' => $response]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Reservation failed', 'data' => $e->getMessage()], 500);
         }
@@ -97,7 +109,11 @@ class ReservationController extends Controller
         // dd($request->all());
         try {
             $reservation = Workspace::deleteReservation($request->workspace_id, $request->reservation_id);
-            return response()->json(['message' => 'Reservation deleted', 'data' => $reservation]);
+            $response = json_decode($reservation, true);
+            if (isset($response['code']) && $response['code'] >= 300) {
+                return response()->json(['message' => 'Reservation failed', 'data' => $response], 400);
+            }
+            return response()->json(['message' => 'Reservation deleted', 'data' => $response]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Reservation failed', 'data' => $e->getMessage()], 500);
         }
