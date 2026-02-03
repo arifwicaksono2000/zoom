@@ -141,4 +141,25 @@ class ReservationController extends Controller
 
         return null;
     }
+
+    public function getWorkspaceReservations($workspace_id, Request $request)
+    {
+        try {
+            $request->validate([
+                'from' => 'required',
+                'to' => 'required',
+            ]);
+            if (strtotime($request->from) > strtotime($request->to)) {
+                return response()->json(['message' => 'Invalid date range'], 400);
+            }
+            $response = Workspace::getWorkspaceReservations($workspace_id, $request->from, $request->to);
+            // $response = json_decode($reservation, true);
+            if (isset($response['code']) && $response['code'] >= 300) {
+                return response()->json(['message' => 'Reservation not found', 'data' => $response], 404);
+            }
+            return response()->json(['message' => 'Reservation found', 'data' => $response]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Reservation not found', 'data' => $e->getMessage()], 500);
+        }
+    }
 }
