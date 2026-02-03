@@ -121,8 +121,14 @@ class Zoom extends Model
         ));
 
         $response = curl_exec($curl);
+        // Get the HTTP status code
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
-        return $response;
+
+        $responseData = json_decode($response, true);
+        $responseData['code'] = $httpCode;
+
+        return json_encode($responseData);
     }
     private static function apiGetWorkspaceReservations($workspace_id, $from, $to)
     {

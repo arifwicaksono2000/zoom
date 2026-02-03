@@ -36,22 +36,57 @@ class Workspace extends Model
     {
         $zoom = Zoom::createReservation($data, $workspace_id);
         return $zoom;
-        $data['reservation_id'] = $zoom['reservation_id'];
-        $reservation = Reservation::create($data);
-        return $reservation;
+
+        $response = json_decode($zoom, true);
+
+        if (isset($response['reservation_id'])) {
+            $dbData = [
+                'workspace_id' => $workspace_id,
+                'reservation_id' => $response['reservation_id'],
+                'start_time' => $data['start_time'],
+                'end_time' => $data['end_time'],
+                'topic' => $data['topic'],
+                'meeting' => isset($data['meeting']) ? json_encode($data['meeting']) : null,
+                'reserve_for' => $data['reserve_for'] ?? null,
+                'status' => 'checked_in', // Default status or strictly from response if available? Assuming 'checked_in' based on user request.
+            ];
+            Reservation::create($dbData);
+        }
     }
     public static function updateReservation($data, $workspace_id, $reservation_id)
     {
         $zoom = Zoom::updateReservation($data, $workspace_id, $reservation_id);
-        // $reservation = Reservation::where('reservation_id', $reservation_id)->first();
-        // $reservation->update($data);
+
+        $reservation = Reservation::where('reservation_id', $reservation_id)->first();
+        if ($reservation) {
+            $updateData = [
+                'start_time' => $data['start_time'],
+                'end_time' => $data['end_time'],
+                'topic' => $data['topic'],
+            ];
+
+            // Only update optional fields if they are present in the request
+            if (isset($data['reserve_for'])) {
+                $updateData['reserve_for'] = $data['reserve_for'];
+            }
+            if (isset($data['meeting'])) {
+                $updateData['meeting'] = json_encode($data['meeting']);
+            }
+
+            $reservation->update($updateData);
+        }
+
         return $zoom;
     }
     public static function deleteReservation($workspace_id, $reservation_id)
     {
         $zoom = Zoom::deleteReservation($workspace_id, $reservation_id);
-        // $reservation = Reservation::where('reservation_id', $reservation_id)->first();
-        // $reservation->delete();
+
+        $reservation = Reservation::where('reservation_id', $reservation_id)->first();
+        if ($reservation) {
+            $reservation->delete();
+        }
+
         return $zoom;
     }
     public static function getWorkspaceByLocation($location_id)

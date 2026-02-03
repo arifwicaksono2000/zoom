@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reservation extends Model
 {
+    use SoftDeletes;
+    
     //
     protected $table = 'reservations';
     protected $fillable = [
@@ -21,8 +24,5 @@ class Reservation extends Model
     {
         return $this->belongsTo(Workspace::class);
     }
-    public static function create(array $data)
-    {
-        return self::create($data);
-    }
+
 }
