@@ -32,17 +32,17 @@ class Workspace extends Model
         $zoom = Zoom::getReservationbyReservationId($workspace_id, $reservation_id);
         return $zoom;
     }
+
     public static function createReservation($data, $workspace_id)
     {
         $zoom = Zoom::createReservation($data, $workspace_id);
-        return $zoom;
 
         $response = json_decode($zoom, true);
 
-        if (isset($response['reservation_id'])) {
+        if (isset($response['code']) && $response['code'] < 300) {
             $dbData = [
                 'workspace_id' => $workspace_id,
-                'reservation_id' => $response['reservation_id'],
+                'reservation_id' => $response['response']['reservation_id'],
                 'start_time' => $data['start_time'],
                 'end_time' => $data['end_time'],
                 'topic' => $data['topic'],
@@ -52,6 +52,8 @@ class Workspace extends Model
             ];
             Reservation::create($dbData);
         }
+
+        return $zoom;
     }
     public static function updateReservation($data, $workspace_id, $reservation_id)
     {
