@@ -14,49 +14,30 @@ class WorkspaceController extends Controller
     {
         return response()->json(['message' => 'Workspace index']);
     }
-    public function getAll()
+    public function getAllLocation()
     {
-        $location = Location::with('workspaces')->get();
+        $location = Location::get();
+        return response()->json(['message' => 'success', 'data' => $location]);
+    }
+    public function getLocation($location_id)
+    {
+        $location = Location::where('location_id', $location_id)->first();
         return response()->json(['message' => 'success', 'data' => $location->toArray()]);
     }
-    public function getByLocation($location_id)
-    {
-        $location = Location::with('workspaces')->find($location_id);
-        return response()->json(['message' => 'success', 'data' => $location->toArray()]);
-    }
 
-    public function store(Request $request)
+    public function show($workspace_id)
     {
-        $workspace = new Workspace();
-        $workspace->workspace_name = $request->workspace_name;
-        $workspace->workspace_id = $request->workspace_id;
-        $workspace->workspace_display_name = $request->workspace_display_name;
-        $workspace->location_id = $request->location_id;
-        $workspace->save();
-        return response()->json(['message' => 'success', 'data' => $workspace->toArray()]);
+        $workspace = Workspace::getWorkspaceByWorkspaceId($workspace_id);
+        return response()->json(['message' => 'success', 'data' => $workspace]);
     }
-
-    public function show($id)
+    public function getWorkspaceByLocation($location_id)
     {
-        $workspace = Workspace::with('location')->where('workspace_id', $id)->first();
-        return response()->json(['message' => 'success', 'data' => $workspace->toArray()]);
+        $workspace = Workspace::getWorkspaceByLocation($location_id);
+        return response()->json(['message' => 'success', 'data' => $workspace]);
     }
-
-    public function update(Request $request, $id)
+    public function getAllWorkspace()
     {
-        $workspace = Workspace::where('workspace_id', $id)->first();
-        $workspace->workspace_name = $request->workspace_name;
-        $workspace->workspace_id = $request->workspace_id;
-        $workspace->workspace_display_name = $request->workspace_display_name;
-        $workspace->location_id = $request->location_id;
-        $workspace->save();
-        return response()->json(['message' => 'success', 'data' => $workspace->toArray()]);
-    }
-
-    public function destroy($id)
-    {
-        $workspace = Workspace::where('workspace_id', $id)->first();
-        $workspace->delete();
+        $workspace = Workspace::get();
         return response()->json(['message' => 'success', 'data' => $workspace->toArray()]);
     }
 }

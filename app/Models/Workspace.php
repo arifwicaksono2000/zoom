@@ -21,10 +21,11 @@ class Workspace extends Model
     {
         return $this->hasMany(Reservation::class);
     }
-    public function getWorkspaceReservations($from, $to)
+    public static function getWorkspaceReservations($workspace_id, $from, $to)
     {
-        $zoom = Zoom::getWorkspaceReservations($this->workspace_id, $from, $to);
-        return $zoom;
+        $zoom = Zoom::getWorkspaceReservations($workspace_id, $from, $to);
+        $response = json_decode($zoom, true);
+        return $response;
     }
     public static function getReservationbyReservationId($workspace_id, $reservation_id)
     {
@@ -52,5 +53,33 @@ class Workspace extends Model
         // $reservation = Reservation::where('reservation_id', $reservation_id)->first();
         // $reservation->delete();
         return $zoom;
+    }
+    public static function getWorkspaceByLocation($location_id)
+    {
+        $workspaces = Zoom::listWorkspacebyLocation($location_id);
+        $data = [];
+        foreach ($workspaces as $value) {
+            $data[] = [
+                'workspace_id' => $value['id'],
+                'workspace_name' => $value['workspace_name'],
+                'location_id' => $value['location_id'],
+            ];
+        }
+        return $data;
+    }
+    public static function getWorkspaceByWorkspaceId($workspace_id)
+    {
+        $workspace = Zoom::getWorkspaceByWorkspaceId($workspace_id);
+        $data = [];
+        $data['workspace_id'] = $workspace['id'];
+        $data['workspace_name'] = $workspace['workspace_name'];
+        $data['workspace_display_name'] = $workspace['workspace_display_name'];
+        $data['location_id'] = $workspace['location_id'];
+        return $data;
+    }
+    public static function getAllWorkspace()
+    {
+        $workspace = Workspace::get();
+        return $workspace;
     }
 }
