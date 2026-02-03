@@ -74,7 +74,7 @@ class Zoom extends Model
     {
         $response = self::apiGetWorkspaceByWorkspaceId($workspace_id);
         $data = json_decode($response, true);
-        return $data['workspaces'];
+        return $data;
     }
 
     private static function apiCreateReservation($data, $workspace_id)
@@ -116,7 +116,7 @@ class Zoom extends Model
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json',
                 'Accept: application/json',
-                'Authorization: Bearer ' . json_decode(self::login())->access_token,
+                'Authorization: Bearer ' . self::checkToken(),
             ),
         ));
 
@@ -139,7 +139,7 @@ class Zoom extends Model
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
-                'Authorization: Bearer ' . json_decode(self::login())->access_token,
+                'Authorization: Bearer ' . self::checkToken(),
             ),
         ));
 
@@ -162,7 +162,7 @@ class Zoom extends Model
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
-                'Authorization: Bearer ' . json_decode(self::login())->access_token,
+                'Authorization: Bearer ' . self::checkToken(),
             ),
         ));
 
@@ -187,7 +187,7 @@ class Zoom extends Model
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json',
                 'Accept: application/json',
-                'Authorization: Bearer ' . json_decode(self::login())->access_token,
+                'Authorization: Bearer ' . self::checkToken(),
             ),
         ));
 
@@ -210,7 +210,7 @@ class Zoom extends Model
             CURLOPT_CUSTOMREQUEST => 'DELETE',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
-                'Authorization: Bearer ' . json_decode(self::login())->access_token,
+                'Authorization: Bearer ' . self::checkToken(),
             ),
         ));
 
@@ -233,7 +233,7 @@ class Zoom extends Model
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
-                'Authorization: Bearer ' . json_decode(self::login())->access_token,
+                'Authorization: Bearer ' . self::checkToken(),
             ),
         ));
 
@@ -256,7 +256,7 @@ class Zoom extends Model
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
-                'Authorization: Bearer ' . json_decode(self::login())->access_token,
+                'Authorization: Bearer ' . self::checkToken(),
             ),
         ));
 
@@ -264,5 +264,21 @@ class Zoom extends Model
 
         curl_close($curl);
         return $response;
+    }
+    private static function checkToken()
+    {
+        $now = now();
+        if (!session('zoom_token')) {
+            $newtoken = json_decode(self::login());
+            $ztoken = (object) array('access_token' => $newtoken->access_token, 'expires_at' => $now->addSeconds($newtoken->expires_in));
+            session(['zoom_token' => $ztoken]);
+        }
+        $ztoken = session('zoom_token');
+        if ($ztoken->expires_at < $now) {
+            $newtoken = json_decode(self::login());
+            $ztoken = (object) array('access_token' => $newtoken->access_token, 'expires_at' => $now->addSeconds($newtoken->expires_in));
+            session(['zoom_token' => $ztoken]);
+        }
+        return $ztoken->access_token;
     }
 }
