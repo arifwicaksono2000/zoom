@@ -29,8 +29,9 @@ Route::group([
     Route::get('/location', [WorkspaceController::class, 'getAllLocation']);
     Route::get('/location/{location_id}/workspace', [WorkspaceController::class, 'getWorkspaceByLocation']);
 });
+
 // Route::get('/workspace', [WorkspaceController::class, 'index']);
-// // Route::get('/workspace/all', [WorkspaceController::class, 'getAll']);
+// Route::get('/workspace/all', [WorkspaceController::class, 'getAll']);
 // Route::get('/workspace/{workspace_id}', [WorkspaceController::class, 'show']);
 // Route::get('/workspace/{workspace_id}/reservation', [ReservationController::class, 'getWorkspaceReservations']);
 // Route::get('/location', [WorkspaceController::class, 'getAllLocation']);

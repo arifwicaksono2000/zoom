@@ -80,25 +80,42 @@ class ReservationController extends Controller
     }
     public function update(Request $request)
     {
+        $request->validate([
+            'workspace_id' => 'required',
+            'reservation_id' => 'required',
+            'topic' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ]);
+
+        $validationError = $this->validateReservationTime($request->start_time, $request->end_time);
+        if ($validationError) {
+            return response()->json($validationError, 422);
+        }
+
         try {
-            $request->validate([
-                'workspace_id' => 'required',
-                'reservation_id' => 'required',
-                'topic' => 'required',
-                'start_time' => 'required',
-                'end_time' => 'required',
-            ]);
-
-            $validationError = $this->validateReservationTime($request->start_time, $request->end_time);
-            if ($validationError) {
-                return response()->json($validationError, 422);
-            }
-
             $data = [
                 'topic' => $request->topic,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
             ];
+
+            if ($request->meeting) {
+                $request->validate([
+                    'meeting.end_to_end_encrypted' => 'boolean',
+                    'meeting.password' => 'string',
+                    'meeting.waiting_room' => 'boolean',
+                    'meeting.meeting_uuid' => 'string',
+                ]);
+                $data['meeting'] = $request->meeting;
+            }
+            if ($request->reserve_for) {
+                $request->validate([
+                    'reserve_for' => 'string',
+                ]);
+                $data['reserve_for'] = $request->reserve_for;
+            }
+
             $reservation = Workspace::updateReservation($data, $request->workspace_id, $request->reservation_id);
             $response = json_decode($reservation, true);
             if (isset($response['code']) && $response['code'] >= 300) {
@@ -112,6 +129,11 @@ class ReservationController extends Controller
 
     public function destroy(Request $request)
     {
+        $request->validate([
+            'workspace_id' => 'required',
+            'reservation_id' => 'required',
+        ]);
+
         try {
             $reservation = Workspace::deleteReservation($request->workspace_id, $request->reservation_id);
             $response = json_decode($reservation, true);
