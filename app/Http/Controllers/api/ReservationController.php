@@ -15,19 +15,19 @@ class ReservationController extends Controller
     }
     public function store(Request $request)
     {
+        $request->validate([
+            'workspace_id' => 'required',
+            'topic' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ]);
+
+        $validationError = $this->validateReservationTime($request->start_time, $request->end_time);
+        if ($validationError) {
+            return response()->json($validationError, 422);
+        }
+
         try {
-            $request->validate([
-                'workspace_id' => 'required',
-                'topic' => 'required',
-                'start_time' => 'required',
-                'end_time' => 'required',
-            ]);
-
-            $validationError = $this->validateReservationTime($request->start_time, $request->end_time);
-            if ($validationError) {
-                return response()->json($validationError, 422);
-            }
-
             $data = [
                 'topic' => $request->topic,
                 'start_time' => $request->start_time,
@@ -50,14 +50,16 @@ class ReservationController extends Controller
             }
             $reservation = Workspace::createReservation($data, $request->workspace_id);
             $response = json_decode($reservation, true);
+
+            // return response()->json(['message' => 'Reservation Debug', 'data' => $response], 400);
+
             if (isset($response['code']) && $response['code'] >= 300) {
                 return response()->json(['message' => 'Reservation failed', 'data' => $response], 400);
             }
 
             return response()->json([
-                // 'response' => $response,
-                'reservation_id' => $response['reservation_id'], // Note: User requested extra space in key
-                'status' => $response['reservation_id']
+                'reservation_id' => $response['reservation_id'],
+                'status' => $response['status']
             ]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Reservation failed', 'data' => $e->getMessage()], 500);

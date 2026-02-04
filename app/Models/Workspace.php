@@ -42,13 +42,13 @@ class Workspace extends Model
         if (isset($response['code']) && $response['code'] < 300) {
             $dbData = [
                 'workspace_id' => $workspace_id,
-                'reservation_id' => $response['response']['reservation_id'],
+                'reservation_id' => $response['reservation_id'],
                 'start_time' => $data['start_time'],
                 'end_time' => $data['end_time'],
                 'topic' => $data['topic'],
                 'meeting' => isset($data['meeting']) ? json_encode($data['meeting']) : null,
                 'reserve_for' => $data['reserve_for'] ?? null,
-                'status' => 'checked_in', // Default status or strictly from response if available? Assuming 'checked_in' based on user request.
+                'status' => $response['status'],
             ];
             Reservation::create($dbData);
         }
