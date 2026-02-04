@@ -73,7 +73,7 @@ class ReservationController extends Controller
             if (isset($response['code']) && $response['code'] >= 300) {
                 return response()->json(['message' => 'Reservation not found', 'data' => $response], 404);
             }
-            return response()->json(['message' => 'Reservation found', 'data' => $response]);
+            return response()->json(['message' => 'Reservation found', 'data' => $response['result']]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Reservation not found', 'data' => $e->getMessage()], 500);
         }
