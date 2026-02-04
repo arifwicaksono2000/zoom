@@ -4,14 +4,13 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class AddExecutionTime
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -22,16 +21,20 @@ class AddExecutionTime
 
         $endTime = microtime(true);
         $executionTime = $endTime - $startTime;
-        $formattedExecutionTime = number_format($executionTime, 3); // Format to 3 decimal places
+        $formattedExecutionTime = number_format($executionTime, 3);
 
-        // Decode the original response content to an array
-        $originalContent = json_decode($response->getContent(), true);
+        // Safety Check: Only modify if the response is JSON
+        if ($response instanceof JsonResponse) {
+            $data = $response->getData(true); // Get data as an associative array
 
-        // Add execution time to the response data
-        $originalContent['time_spent'] = $formattedExecutionTime . 's';
+            // Add execution time to the data array
+            $data['performance'] = [
+                'time_spent' => $formattedExecutionTime . 's',
+                'memory_usage' => round(memory_get_usage() / 1024 / 1024, 2) . ' MB'
+            ];
 
-        // Encode the array back to JSON and set it as the response content
-        $response->setContent(json_encode($originalContent));
+            $response->setData($data);
+        }
 
         return $response;
     }
