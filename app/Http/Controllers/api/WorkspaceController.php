@@ -5,7 +5,6 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Models\Workspace;
-use Illuminate\Http\Request;
 
 class WorkspaceController extends Controller
 {
