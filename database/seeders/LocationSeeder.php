@@ -16,12 +16,20 @@ class LocationSeeder extends Seeder
         // $locations = Zoom::listLocation();
         $locations = [
             [
+                "name" => "Lantai 3",
+                "location_id" => "ZorPKdF5Qhayz1bd_PUy4A",
+            ],
+            [
                 "name" => "Lantai 4",
                 "location_id" => "ybq2Bw2rRQK1oEVACQIzDA",
             ],
             [
                 "name" => "Lantai 5",
                 "location_id" => "mF_oINIfRsu8eIA41esVdg",
+            ],
+            [
+                "name" => "Lantai 6",
+                "location_id" => "4FirfiIYSWapLVa0rvrCMQ",
             ],
         ];
         $data = [];
