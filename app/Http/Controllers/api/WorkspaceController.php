@@ -22,19 +22,31 @@ class WorkspaceController extends Controller
     }
     public function getLocation($location_id)
     {
-        $location = Location::where('location_id', $location_id)->first();
-        return response()->json(['message' => 'success', 'data' => $location->toArray()]);
+        try {
+            $location = Location::where('location_id', $location_id)->first();
+            return response()->json(['message' => 'success', 'data' => $location->toArray()]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Location not found', 'data' => $e->getMessage()], 404);
+        }
     }
 
     public function show($workspace_id)
     {
-        $workspace = Workspace::getWorkspaceByWorkspaceId($workspace_id);
-        return response()->json(['message' => 'success', 'data' => $workspace]);
+        try {
+            $workspace = Workspace::getWorkspaceByWorkspaceId($workspace_id);
+            return response()->json(['message' => 'success', 'data' => $workspace]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Workspace not found', 'data' => $e->getMessage()], 404);
+        }
     }
     public function getWorkspaceByLocation($location_id)
     {
-        $workspace = Workspace::getWorkspaceByLocation($location_id);
-        return response()->json(['message' => 'success', 'data' => $workspace]);
+        try {
+            $workspace = Workspace::getWorkspaceByLocation($location_id);
+            return response()->json(['message' => 'success', 'data' => $workspace]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Workspace not found', 'data' => $e->getMessage()], 404);
+        }
     }
     public function getAllWorkspace()
     {

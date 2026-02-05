@@ -93,6 +93,7 @@ class Workspace extends Model
     }
     public static function getWorkspaceByLocation($location_id)
     {
+
         $workspaces = Zoom::listWorkspacebyLocation($location_id);
         $data = [];
         foreach ($workspaces as $value) {
