@@ -69,13 +69,21 @@ class Zoom extends Model
     {
         $response = self::apiGetWorkspacebyLocation($location_id);
         $data = json_decode($response, true);
-        return $data['workspaces'];
+        if (isset($data['workspaces'])) {
+            return $data['workspaces'];
+        } else {
+            throw new \Exception('No workspaces found for location ' . $location_id);
+        }
     }
     public static function getWorkspaceByWorkspaceId($workspace_id)
     {
         $response = self::apiGetWorkspaceByWorkspaceId($workspace_id);
         $data = json_decode($response, true);
-        return $data;
+        if (isset($data['id'])) {
+            return $data;
+        } else {
+            throw new \Exception('No workspace found for workspace id ' . $workspace_id);
+        }
     }
 
     private static function apiCreateReservation($data, $workspace_id)
