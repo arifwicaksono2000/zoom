@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Zoom extends Model
 {
@@ -274,17 +275,23 @@ class Zoom extends Model
     private static function checkToken()
     {
         $now = now();
-        if (!session('zoom_token')) {
+        $id = Auth::user()->id;
+        $user = User::find($id);
+        if (!$user->zoom_token) {
             $newtoken = json_decode(self::login());
-            $ztoken = (object) array('access_token' => $newtoken->access_token, 'expires_at' => $now->addSeconds($newtoken->expires_in));
-            session(['zoom_token' => $ztoken]);
+            $user->zoom_token = $newtoken->access_token;
+            $user->zoom_token_expires_at = $now->addSeconds($newtoken->expires_in);
+            $user->zoom_token_type = $newtoken->token_type;
+            $user->save();
         }
-        $ztoken = session('zoom_token');
-        if ($ztoken->expires_at < $now) {
+        $ztoken = $user->zoom_token;
+        if ($user->zoom_token_expires_at < $now) {
             $newtoken = json_decode(self::login());
-            $ztoken = (object) array('access_token' => $newtoken->access_token, 'expires_at' => $now->addSeconds($newtoken->expires_in));
-            session(['zoom_token' => $ztoken]);
+            $user->zoom_token = $newtoken->access_token;
+            $user->zoom_token_expires_at = $now->addSeconds($newtoken->expires_in);
+            $user->zoom_token_type = $newtoken->token_type;
+            $user->save();
         }
-        return $ztoken->access_token;
+        return $user->zoom_token;
     }
 }

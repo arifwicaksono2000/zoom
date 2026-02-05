@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('zoom_token')->nullable();
+            $table->timestamp('zoom_token_expires_at')->nullable();
+            $table->string('zoom_token_type')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
