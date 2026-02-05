@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
+            $table->string('workspace_id');
+            $table->string('reservation_id')->unique();
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
+            $table->string('topic');
+            $table->json('meeting')->nullable();
+            $table->string('reserve_for')->nullable();
+            $table->string('status')->default('checked_in');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
