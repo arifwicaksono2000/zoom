@@ -5,6 +5,8 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Models\Workspace;
+use App\Models\Zoom;
+use Illuminate\Support\Facades\Auth;
 
 class WorkspaceController extends Controller
 {
