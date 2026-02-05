@@ -284,7 +284,6 @@ class Zoom extends Model
             $user->zoom_token_type = $newtoken->token_type;
             $user->save();
         }
-        $ztoken = $user->zoom_token;
         if ($user->zoom_token_expires_at < $now) {
             $newtoken = json_decode(self::login());
             $user->zoom_token = $newtoken->access_token;
